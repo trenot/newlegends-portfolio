@@ -1,0 +1,266 @@
+/* ==========================================================================
+   NewLegends: Jodie Devine's Concert Photography Journal & Review Archive
+   Organic Analog Film Aesthetic Stylesheet
+   Canvas: Warm Espresso (#0c0a09) · Warm Stone Surfaces · Film Perforations
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  --color-canvas: #0c0a09;
+  --color-surface-stone: #171412;
+  --color-surface-elevated: #211d1a;
+  --color-surface-card: #28231f;
+  --color-surface-border: #38312b;
+  --color-surface-border-subtle: #2d2621;
+  --color-amber: #f59e0b;
+  --color-amber-dark: #b45309;
+  --color-amber-glow: rgba(245, 158, 11, 0.15);
+  --color-warm-cream: #f6f3eb;
+  --color-warm-stone: #d3cbbe;
+  --color-muted: #948b83;
+  --color-ruby: #e11d48;
+  
+  --font-editorial: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+/* Global Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-canvas);
+  color: var(--color-warm-cream);
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-warm-cream);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 35mm Analog Film Grain Overlay */
+.film-grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  transition: opacity 0.3s ease;
+}
+
+body.grain-disabled .film-grain-overlay {
+  opacity: 0 !important;
+}
+
+/* Typography Utility */
+.font-serif-editorial {
+  font-family: var(--font-editorial);
+}
+
+.font-mono-tag {
+  font-family: var(--font-mono);
+}
+
+/* Organic Deckled Border & Film Card styling */
+.deckled-card {
+  background: var(--color-surface-stone);
+  border: 1px solid var(--color-surface-border);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  position: relative;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.deckled-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 20px var(--color-amber-glow);
+}
+
+/* 35mm Contact Sheet / Film Sprockets effect */
+.film-sprockets {
+  position: relative;
+  border-top: 10px solid #14110f;
+  border-bottom: 10px solid #14110f;
+}
+
+.film-sprockets::before,
+.film-sprockets::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-image: radial-gradient(#2d2621 40%, transparent 45%);
+  background-size: 14px 6px;
+  background-repeat: repeat-x;
+  z-index: 10;
+}
+
+.film-sprockets::before {
+  top: -8px;
+}
+
+.film-sprockets::after {
+  bottom: -8px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f0d0b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #332d27;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-amber);
+}
+
+/* 4-Axis Rating Meter Custom Styling */
+.axis-meter-bar {
+  height: 6px;
+  border-radius: 9999px;
+  background: #231f1c;
+  overflow: hidden;
+  position: relative;
+}
+
+.axis-meter-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fill-energy {
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+}
+
+.fill-vocals {
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+}
+
+.fill-crowd {
+  background: linear-gradient(90deg, #10b981, #f59e0b);
+}
+
+.fill-acoustics {
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+}
+
+/* Form Slider custom styling */
+input[type="range"].analog-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #2b2520;
+  border-radius: 4px;
+  outline: none;
+}
+
+input[type="range"].analog-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-amber);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  border: 2px solid #14110f;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].analog-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Badge & Tag Styling */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: #1c1815;
+  border: 1px solid #332b25;
+  color: var(--color-warm-stone);
+}
+
+.tag-pill.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--color-amber);
+  color: var(--color-amber);
+}
+
+/* Lightbox Animation */
+#photo-lightbox {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Leaflet Map Custom Espresso Dark Styling */
+.leaflet-container {
+  background-color: #120f0d !important;
+  font-family: var(--font-sans) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #1c1917 !important;
+  color: #f6f3eb !important;
+  border-radius: 1rem !important;
+  border: 1px solid #44403c !important;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.7) !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: #1c1917 !important;
+  border: 1px solid #44403c !important;
+}
+
+/* Radar Chart SVG */
+.radar-polygon {
+  fill: rgba(245, 158, 11, 0.25);
+  stroke: #f59e0b;
+  stroke-width: 2;
+  transition: all 0.5s ease;
+}
+
+/* Responsive container adjustments */
+@media (max-width: 640px) {
+  .deckled-card {
+    border-radius: 1.25rem;
+  }
+}

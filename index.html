@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NewLegends · Jodie Devine's Concert Photography Journal & Review Archive</title>
+  <meta name="description" content="Concert photography portfolio and reviews of music & live tours by Jodie Devine. Featuring 4-axis rating audits, multi-city road timelines, pit photo vault, and interactive tour analytics." />
+  <meta name="theme-color" content="#0c0a09" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            espresso: '#0c0a09',
+            stone: {
+              850: '#1c1917',
+              900: '#171412',
+              950: '#0c0a09'
+            },
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706'
+            }
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
+            mono: ['Space Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS & JS for Interactive Tour Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Custom Analog Film Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="bg-[#0c0a09] text-[#f6f3eb] antialiased selection:bg-amber-500 selection:text-stone-950 min-h-screen flex flex-col justify-between">
+
+  <!-- 35mm Analog Film Grain Overlay -->
+  <div id="film-grain-overlay" class="film-grain-overlay"></div>
+
+  <!-- Main Application Header -->
+  <header class="sticky top-0 z-50 bg-[#0c0a09]/90 backdrop-blur-md border-b border-stone-800/80 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Brand Mark -->
+        <a href="#/home" class="flex items-center gap-3.5 group">
+          <div class="w-10 h-10 rounded-2xl bg-stone-900 border border-stone-700/80 flex items-center justify-center text-amber-400 group-hover:border-amber-400 transition-colors shadow-lg">
+            <i data-lucide="camera" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-xl sm:text-2xl font-serif-editorial font-bold tracking-tight text-stone-100 group-hover:text-amber-400 transition-colors block">
+              NewLegends
+            </span>
+            <div class="text-[11px] font-mono text-stone-400 tracking-wider">
+              Jodie Devine's Review Archive
+            </div>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Bar -->
+        <nav class="hidden lg:flex items-center gap-1 xl:gap-2 text-xs font-mono tracking-wider uppercase">
+          <a href="#/home" data-nav-target="home" class="px-3 py-2 rounded-xl border border-transparent text-stone-300 hover:text-amber-400 hover:bg-stone-900/60 transition-all">
+            Spotlight
+          </a>
+          <a href="#/reviews" data-nav-target="reviews" class="px-3 py-2 rounded-xl border border-transparent text-stone-300 hover:text-amber-400 hover:bg-stone-900/60 transition-all">
+            Reviews & Shows
+          </a>
+          <a href="#/timeline" data-nav-target="timeline" class="px-3 py-2 rounded-xl border border-transparent text-stone-300 hover:text-amber-400 hover:bg-stone-900/60 transition-all">
+            Tour Timeline
+          </a>
+          <a href="#/vault" data-nav-target="vault" class="px-3 py-2 rounded-xl border border-transparent text-stone-300 hover:text-amber-400 hover:bg-stone-900/60 transition-all">
+            Photo Vault
+          </a>
+          <a href="#/stats" data-nav-target="stats" class="px-3 py-2 rounded-xl border border-transparent text-stone-300 hover:text-amber-400 hover:bg-stone-900/60 transition-all">
+            Stats & Map
+          </a>
+          <a href="#/sitemap" data-nav-target="sitemap" class="px-3 py-2 rounded-xl border border-transparent text-stone-300 hover:text-amber-400 hover:bg-stone-900/60 transition-all">
+            Sitemap
+          </a>
+          <a href="#/about" data-nav-target="about" class="px-3 py-2 rounded-xl border border-transparent text-stone-300 hover:text-amber-400 hover:bg-stone-900/60 transition-all">
+            About Jodie
+          </a>
+        </nav>
+
+        <!-- Right Action Hub: Quick Search, Grain Toggle & Log CTA -->
+        <div class="hidden sm:flex items-center gap-3">
+          <!-- Global Search Input with '/' shortcut -->
+          <div class="relative hidden md:block">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500"></i>
+            <input 
+              type="text" 
+              id="global-search-input" 
+              placeholder="Search shows... (/)" 
+              class="w-40 focus:w-56 bg-stone-900/80 border border-stone-800 rounded-xl py-1.5 pl-8 pr-3 text-xs text-stone-200 placeholder-stone-500 focus:outline-none focus:border-amber-400 transition-all font-mono"
+            />
+          </div>
+
+          <!-- 35mm Film Grain Toggle -->
+          <button 
+            id="grain-toggle-btn" 
+            title="Toggle 35mm Film Grain Effect" 
+            class="p-2 rounded-xl bg-stone-900/80 border border-stone-800 text-stone-400 hover:text-amber-400 transition-colors flex items-center gap-1.5 text-xs font-mono"
+          >
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span class="hidden xl:inline text-[10px]">GRAIN</span>
+          </button>
+
+          <!-- Photo Manager CTA -->
+          <button 
+            id="open-photo-manager-btn" 
+            title="Replace placeholder images with real concert photography" 
+            class="px-3.5 py-2 rounded-xl bg-stone-900/80 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/50 text-stone-300 hover:text-amber-400 font-mono text-xs transition-all flex items-center gap-1.5 shadow-md"
+          >
+            <i data-lucide="image-plus" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span class="hidden md:inline">Replace Photos</span>
+          </button>
+
+          <!-- Log a Show Primary CTA -->
+          <button 
+            class="open-log-modal-btn px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold tracking-wider uppercase transition-all shadow-lg flex items-center gap-1.5"
+          >
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Log Show</span>
+          </button>
+        </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <div class="flex items-center gap-2 lg:hidden">
+          <button 
+            class="open-log-modal-btn p-2 rounded-xl bg-amber-500 text-stone-950 text-xs font-bold flex items-center justify-center sm:hidden"
+            title="Log a Show"
+          >
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </button>
+          <button 
+            id="mobile-menu-toggle" 
+            class="p-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-300 hover:text-amber-400"
+            aria-label="Toggle Mobile Menu"
+          >
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-nav-drawer" class="hidden lg:hidden border-b border-stone-800 bg-[#0c0a09]/95 backdrop-blur-xl px-4 pt-2 pb-6 space-y-3 font-mono text-sm uppercase">
+      <div class="flex justify-between items-center py-2 border-b border-stone-800">
+        <span class="text-xs text-stone-500">NAVIGATION</span>
+        <button id="mobile-nav-close" class="text-stone-400 hover:text-stone-100 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <a href="#/home" data-nav-target="home" class="p-3 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-amber-400 flex items-center gap-2">
+          <i data-lucide="home" class="w-4 h-4 text-amber-400"></i> Spotlight
+        </a>
+        <a href="#/reviews" data-nav-target="reviews" class="p-3 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-amber-400 flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i> Reviews
+        </a>
+        <a href="#/timeline" data-nav-target="timeline" class="p-3 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-amber-400 flex items-center gap-2">
+          <i data-lucide="git-commit" class="w-4 h-4 text-amber-400"></i> Timeline
+        </a>
+        <a href="#/vault" data-nav-target="vault" class="p-3 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-amber-400 flex items-center gap-2">
+          <i data-lucide="camera" class="w-4 h-4 text-amber-400"></i> Photo Vault
+        </a>
+        <a href="#/stats" data-nav-target="stats" class="p-3 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-amber-400 flex items-center gap-2">
+          <i data-lucide="map" class="w-4 h-4 text-amber-400"></i> Stats & Map
+        </a>
+        <a href="#/sitemap" data-nav-target="sitemap" class="p-3 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-amber-400 flex items-center gap-2">
+          <i data-lucide="network" class="w-4 h-4 text-amber-400"></i> Sitemap
+        </a>
+      </div>
+      <div class="pt-2 space-y-2">
+        <button id="mobile-open-photo-manager-btn" class="w-full p-3 rounded-xl bg-stone-900 border border-stone-800 hover:border-amber-400 flex items-center justify-between text-xs text-stone-200">
+          <span class="flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4 text-amber-400"></i> Replace Placeholder Photos</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-stone-500"></i>
+        </button>
+        <a href="#/about" data-nav-target="about" class="p-3 rounded-xl bg-stone-900 border border-stone-800 hover:border-amber-400 flex items-center justify-between text-xs">
+          <span class="flex items-center gap-2"><i data-lucide="user" class="w-4 h-4 text-amber-400"></i> About Jodie & Contact</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-stone-500"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dynamic Content Outlet (Views render here) -->
+  <main id="main-content-outlet" class="flex-grow">
+    <!-- Populated by JavaScript according to current route -->
+  </main>
+
+  <!-- Persistent Editorial Footer -->
+  <footer class="border-t border-stone-800/80 bg-[#120f0d] pt-16 pb-12 text-stone-400 font-sans mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
+        
+        <!-- Brand & Mission Column -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-stone-900 border border-stone-700 flex items-center justify-center text-amber-400">
+              <i data-lucide="film" class="w-4 h-4"></i>
+            </div>
+            <span class="text-xl font-serif-editorial font-bold text-stone-100">NewLegends</span>
+          </div>
+          <p class="text-stone-300 font-light text-sm leading-relaxed max-w-md">
+            Jodie Devine's concert photography journal & live music archive. Dedicated to preserving pit energy, barrier-level communion, and critical music journalism across the American tour circuit.
+          </p>
+          <div class="text-xs font-mono text-stone-500">
+            Aesthetic: Warm Espresso (#0c0a09) · 35mm Analog Film Grain · Deckled Surfaces
+          </div>
+        </div>
+
+        <!-- Sitemap Quick Nav Column -->
+        <div class="lg:col-span-3 space-y-3 font-mono text-xs">
+          <div class="text-stone-200 uppercase tracking-widest font-bold">Archive Navigation</div>
+          <ul class="space-y-2">
+            <li><a href="#/home" class="hover:text-amber-400 transition-colors">Spotlight / Home</a></li>
+            <li><a href="#/reviews" class="hover:text-amber-400 transition-colors">Editorial Reviews (18 Shows)</a></li>
+            <li><a href="#/timeline" class="hover:text-amber-400 transition-colors">Tour Run Road Timeline</a></li>
+            <li><a href="#/vault" class="hover:text-amber-400 transition-colors">Concert Photo Vault</a></li>
+            <li><a href="#/stats" class="hover:text-amber-400 transition-colors">Show Analytics & Interactive Map</a></li>
+            <li><a href="#/sitemap" class="hover:text-amber-400 transition-colors">Full Site Directory / Sitemap</a></li>
+            <li><a href="#/about" class="hover:text-amber-400 transition-colors">About Jodie & Gear Bag</a></li>
+          </ul>
+        </div>
+
+        <!-- External Publication Channels Column -->
+        <div class="lg:col-span-4 space-y-3 font-mono text-xs">
+          <div class="text-stone-200 uppercase tracking-widest font-bold">Direct Platform Integration</div>
+          <div class="space-y-2 text-stone-300">
+            <a href="https://jumbleofnotes.wordpress.com/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 p-2.5 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-amber-400 transition-colors group">
+              <i data-lucide="globe" class="w-4 h-4 text-amber-400"></i>
+              <div>
+                <div class="font-bold text-stone-100 group-hover:text-amber-400">Jumble of Notes</div>
+                <div class="text-[10px] text-stone-500">Official WordPress Music Review Blog</div>
+              </div>
+            </a>
+
+            <a href="https://www.instagram.com/jodiedevineart/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 p-2.5 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-pink-400 transition-colors group">
+              <i data-lucide="camera" class="w-4 h-4 text-pink-400"></i>
+              <div>
+                <div class="font-bold text-stone-100 group-hover:text-pink-400">@jodiedevineart</div>
+                <div class="text-[10px] text-stone-500">Concert Photography Portfolio on IG</div>
+              </div>
+            </a>
+
+            <a href="https://jodiedevinef.wixsite.com/jodiefolio" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 p-2.5 rounded-xl bg-stone-900/60 border border-stone-800 hover:border-sky-400 transition-colors group">
+              <i data-lucide="external-link" class="w-4 h-4 text-sky-400"></i>
+              <div>
+                <div class="font-bold text-stone-100 group-hover:text-sky-400">Jodie Devine Folio</div>
+                <div class="text-[10px] text-stone-500">Official Web Photography Showcase</div>
+              </div>
+            </a>
+
+            <div class="flex items-center gap-4 pt-1 text-[11px] text-stone-400">
+              <a href="https://www.instagram.com/jodiejodiejo/" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400">IG: @jodiejodiejo</a>
+              <a href="https://www.tiktok.com/@jodiejodiejo1" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400">TikTok: @jodiejodiejo1</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="pt-8 border-t border-stone-800/80 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-mono text-stone-500">
+        <div>
+          &copy; 2026 NewLegends · Jodie Devine. All live photography rights reserved.
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1.5 text-stone-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>LocalStorage Sync Active</span>
+          </span>
+          <button class="open-log-modal-btn hover:text-amber-400 underline">
+            + Log New Show
+          </button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       MODAL 1: FULLSCREEN PHOTO LIGHTBOX WITH EXIF
+       ========================================================================= -->
+  <div id="photo-lightbox" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-2 sm:p-6">
+    <div id="lightbox-backdrop" class="absolute inset-0 bg-stone-950/95 backdrop-blur-md"></div>
+    
+    <div class="relative z-10 max-w-5xl w-full max-h-[95vh] flex flex-col bg-[#14110f] border border-stone-800 rounded-3xl overflow-hidden shadow-2xl">
+      <!-- Top Bar -->
+      <div class="flex justify-between items-center p-4 border-b border-stone-800 bg-stone-950/80 text-xs font-mono">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded-full bg-stone-900 border border-stone-700 text-amber-400" id="lightbox-counter">1 / 1</span>
+          <span class="text-stone-400 hidden sm:inline">Use &larr; &rarr; arrows to browse · ESC to exit</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <a id="lightbox-review-link" href="#" class="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-amber-500 hover:text-stone-950 text-stone-200 border border-stone-700 flex items-center gap-1.5 transition-colors">
+            <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+            <span>View Concert Review</span>
+          </a>
+          <button id="lightbox-close-btn" class="p-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-stone-100 transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Photo Display Area -->
+      <div class="relative flex-1 flex items-center justify-center bg-black/40 min-h-[50vh] overflow-hidden film-sprockets p-2 sm:p-4">
+        <img id="lightbox-image" src="" alt="Live Concert Photo" class="max-h-[68vh] max-w-full object-contain rounded-xl shadow-2xl select-none" />
+
+        <!-- Prev / Next Overlays -->
+        <button id="lightbox-prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-stone-950/80 hover:bg-amber-500 hover:text-stone-950 text-stone-200 border border-stone-800 transition-all shadow-xl">
+          <i data-lucide="chevron-left" class="w-6 h-6"></i>
+        </button>
+        <button id="lightbox-next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-stone-950/80 hover:bg-amber-500 hover:text-stone-950 text-stone-200 border border-stone-800 transition-all shadow-xl">
+          <i data-lucide="chevron-right" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Bottom Caption & EXIF Panel -->
+      <div class="p-4 sm:p-5 border-t border-stone-800 bg-[#171412] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs font-mono">
+        <div class="space-y-0.5">
+          <p id="lightbox-caption" class="text-sm font-sans font-medium text-stone-100"></p>
+          <div id="lightbox-exif" class="text-stone-400 text-[11px]"></div>
+        </div>
+        <div class="text-[10px] text-amber-500 font-bold uppercase tracking-widest">
+          35mm Film Tone Emulation
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: "LOG A SHOW" REVIEW BUILDER (LOCALSTORAGE PERSISTENCE)
+       ========================================================================= -->
+  <div id="log-show-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="log-modal-backdrop" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md"></div>
+
+    <div class="relative z-10 max-w-3xl w-full bg-[#171412] border border-stone-800 rounded-3xl overflow-hidden shadow-2xl my-8">
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center p-6 border-b border-stone-800 bg-stone-950">
+        <div>
+          <div class="text-xs font-mono tracking-widest text-amber-400 uppercase">REVIEW BUILDER</div>
+          <h2 class="text-2xl font-serif-editorial font-bold text-stone-100">Log & Publish a New Concert</h2>
+        </div>
+        <button id="close-log-modal-btn" class="p-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-stone-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <form id="log-show-form" class="p-6 sm:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+        <!-- Basic Meta -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Headlining Artist *</label>
+            <input type="text" id="log-input-artist" required placeholder="e.g. The Band CAMINO" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-sans" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Supporting Acts / Co-Bill</label>
+            <input type="text" id="log-input-supporting" placeholder="e.g. Wilt & Jutes" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-sans" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Show Date *</label>
+            <input type="date" id="log-input-date" required class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-mono" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Venue Name *</label>
+            <input type="text" id="log-input-venue" required placeholder="e.g. TD Garden" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-sans" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">City *</label>
+            <input type="text" id="log-input-city" required placeholder="e.g. Boston" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-sans" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">State *</label>
+            <input type="text" id="log-input-state" required placeholder="e.g. MA" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-mono uppercase" maxlength="2" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Tour Run Name</label>
+            <input type="text" id="log-input-tourrun" placeholder="e.g. North American Arena Run" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-sans" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Pit / Shooting Perspective</label>
+            <input type="text" id="log-input-perspective" placeholder="e.g. Barrier Center, Pit Left" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-sans" />
+          </div>
+        </div>
+
+        <!-- 4-Axis Rating Sliders -->
+        <div class="deckled-card p-5 rounded-2xl border border-stone-800 bg-stone-950/60 space-y-4">
+          <div class="text-xs font-mono text-amber-400 uppercase font-bold">4-Axis Performance Scoring (1.0 to 10.0)</div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Stage Energy</span>
+                <span id="log-rating-energy-val" class="text-amber-400 font-bold">9.5</span>
+              </div>
+              <input type="range" id="log-rating-energy" min="5" max="10" step="0.1" value="9.5" class="analog-slider" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Vocal Precision</span>
+                <span id="log-rating-vocals-val" class="text-sky-400 font-bold">9.4</span>
+              </div>
+              <input type="range" id="log-rating-vocals" min="5" max="10" step="0.1" value="9.4" class="analog-slider" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Crowd Vibe & Reciprocity</span>
+                <span id="log-rating-crowd-val" class="text-emerald-400 font-bold">9.6</span>
+              </div>
+              <input type="range" id="log-rating-crowd" min="5" max="10" step="0.1" value="9.6" class="analog-slider" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Venue Acoustics</span>
+                <span id="log-rating-acoustics-val" class="text-purple-400 font-bold">9.1</span>
+              </div>
+              <input type="range" id="log-rating-acoustics" min="5" max="10" step="0.1" value="9.1" class="analog-slider" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Standout Quote -->
+        <div>
+          <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Standout Review Quote *</label>
+          <input type="text" id="log-input-quote" required placeholder="The defining sensory moment of the night..." class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-serif italic text-sm" />
+        </div>
+
+        <!-- Full Review Narrative -->
+        <div>
+          <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Editorial Concert Review Narrative *</label>
+          <textarea id="log-input-review" rows="5" required placeholder="Write your full editorial review: pit dynamics, lighting rigs, vocal highlights, crowd response..." class="w-full bg-stone-950 border border-stone-800 rounded-xl p-3.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 leading-relaxed font-sans"></textarea>
+        </div>
+
+        <!-- Setlist -->
+        <div>
+          <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Setlist (One song per line, add * for highlights)</label>
+          <textarea id="log-input-setlist" rows="4" placeholder="Daphne Blue *&#10;1 Last Cigarette&#10;Roses&#10;Youngblood *" class="w-full bg-stone-950 border border-stone-800 rounded-xl p-3.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-mono"></textarea>
+        </div>
+
+        <!-- Cover Photo URL -->
+        <div>
+          <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Concert Photo URL (Unsplash or direct image link)</label>
+          <input type="url" id="log-input-photo" placeholder="https://images.unsplash.com/..." class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400 font-mono" />
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex justify-end items-center gap-3 pt-4 border-t border-stone-800">
+          <button type="button" onclick="document.getElementById('log-show-modal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-400 text-xs font-mono uppercase">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold uppercase tracking-wider shadow-lg">
+            Save & Publish Show
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: "EDIT RATINGS & REVIEW" IN-PLACE UPDATER
+       ========================================================================= -->
+  <div id="edit-show-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="edit-modal-backdrop" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md"></div>
+
+    <div class="relative z-10 max-w-2xl w-full bg-[#171412] border border-stone-800 rounded-3xl overflow-hidden shadow-2xl my-8">
+      <div class="flex justify-between items-center p-6 border-b border-stone-800 bg-stone-950">
+        <div>
+          <div class="text-xs font-mono tracking-widest text-amber-400 uppercase">EDIT LIVE ENTRY</div>
+          <h2 id="edit-modal-artist-title" class="text-2xl font-serif-editorial font-bold text-stone-100">Edit Concert Review</h2>
+        </div>
+        <button id="close-edit-modal-btn" class="p-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-stone-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="edit-show-form" class="p-6 sm:p-8 space-y-6">
+        <!-- 4-Axis Sliders -->
+        <div class="deckled-card p-4 rounded-2xl border border-stone-800 bg-stone-950/60 space-y-3 font-mono text-xs">
+          <div class="text-amber-400 uppercase font-bold">Update 4-Axis Scores</div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Energy</span>
+                <span id="edit-rating-energy-val" class="text-amber-400 font-bold">9.5</span>
+              </div>
+              <input type="range" id="edit-rating-energy" min="5" max="10" step="0.1" class="analog-slider" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Vocals</span>
+                <span id="edit-rating-vocals-val" class="text-sky-400 font-bold">9.5</span>
+              </div>
+              <input type="range" id="edit-rating-vocals" min="5" max="10" step="0.1" class="analog-slider" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Crowd Vibe</span>
+                <span id="edit-rating-crowd-val" class="text-emerald-400 font-bold">9.5</span>
+              </div>
+              <input type="range" id="edit-rating-crowd" min="5" max="10" step="0.1" class="analog-slider" />
+            </div>
+
+            <div>
+              <div class="flex justify-between mb-1 text-stone-300">
+                <span>Acoustics</span>
+                <span id="edit-rating-acoustics-val" class="text-purple-400 font-bold">9.5</span>
+              </div>
+              <input type="range" id="edit-rating-acoustics" min="5" max="10" step="0.1" class="analog-slider" />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Standout Quote</label>
+          <input type="text" id="edit-input-quote" required class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 font-serif italic text-sm focus:outline-none focus:border-amber-400" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Review Narrative</label>
+          <textarea id="edit-input-review" rows="6" required class="w-full bg-stone-950 border border-stone-800 rounded-xl p-3.5 text-xs text-stone-100 leading-relaxed font-sans focus:outline-none focus:border-amber-400"></textarea>
+        </div>
+
+        <!-- Photo Update Field -->
+        <div class="deckled-card p-4 rounded-2xl border border-stone-800 bg-stone-950/60 space-y-3 font-mono text-xs">
+          <div class="flex justify-between items-center">
+            <span class="text-amber-400 uppercase font-bold">Show Cover Photo</span>
+            <span class="text-[10px] text-stone-500">Local file or URL</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <img id="edit-photo-preview" src="" alt="Show Preview" class="w-16 h-12 rounded-lg object-cover border border-stone-700 bg-stone-900 shrink-0" />
+            <div class="flex-1 space-y-2">
+              <input type="text" id="edit-input-photo" placeholder="assets/photos/... or https://..." class="w-full bg-stone-900 border border-stone-800 rounded-lg px-2.5 py-1.5 text-xs text-stone-100 focus:outline-none focus:border-amber-400" />
+              <div class="flex items-center gap-2">
+                <label class="cursor-pointer px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 text-[11px] border border-stone-700 inline-flex items-center gap-1">
+                  <i data-lucide="upload" class="w-3 h-3 text-amber-400"></i>
+                  <span>Upload File from Device</span>
+                  <input type="file" id="edit-file-picker" accept="image/*" class="hidden" />
+                </label>
+                <span class="text-[10px] text-stone-500">Auto-compressed for web</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-stone-800">
+          <button type="button" onclick="document.getElementById('edit-show-modal').classList.add('hidden')" class="px-5 py-2 rounded-xl bg-stone-900 text-stone-400 text-xs font-mono uppercase">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold uppercase tracking-wider">
+            Save Updates
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4: PHOTO MANAGER & IMAGE REPLACER
+       ========================================================================= -->
+  <div id="photo-manager-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="photo-manager-backdrop" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md"></div>
+
+    <div class="relative z-10 max-w-3xl w-full bg-[#171412] border border-stone-800 rounded-3xl overflow-hidden shadow-2xl my-8">
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center p-6 border-b border-stone-800 bg-stone-950">
+        <div>
+          <div class="text-xs font-mono tracking-widest text-amber-400 uppercase">PHOTO REPLACER UTILITY</div>
+          <h2 class="text-2xl font-serif-editorial font-bold text-stone-100">Replace Placeholder Images with Real Photography</h2>
+        </div>
+        <button id="close-photo-manager-btn" class="p-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-stone-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 sm:p-8 space-y-8 max-h-[80vh] overflow-y-auto">
+        <!-- Section 1: Single Show Photo Replacer -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+            <h3 class="text-lg font-serif-editorial font-bold text-stone-100 flex items-center gap-2">
+              <i data-lucide="camera" class="w-4 h-4 text-amber-400"></i>
+              <span>Select Concert & Update Image</span>
+            </h3>
+            <span class="text-xs font-mono text-stone-400">Method 1: Direct File / URL</span>
+          </div>
+
+          <div class="space-y-4 bg-stone-950/60 p-5 rounded-2xl border border-stone-800">
+            <!-- Show Selector Dropdown -->
+            <div>
+              <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Choose Concert to Update</label>
+              <select id="pm-concert-select" class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 font-mono focus:outline-none focus:border-amber-400">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+
+            <!-- Current Image Preview & Upload Controls -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+              <div class="sm:col-span-5 relative rounded-xl overflow-hidden border border-stone-700 h-44 bg-stone-900 film-sprockets">
+                <img id="pm-preview-img" src="" alt="Current Photo" class="w-full h-full object-cover" />
+                <div class="absolute bottom-1 right-2 bg-stone-950/80 px-2 py-0.5 rounded text-[10px] font-mono text-stone-400">Current View</div>
+              </div>
+
+              <div class="sm:col-span-7 space-y-3">
+                <!-- Option A: File Picker -->
+                <div>
+                  <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Option A: Upload Image File from Your Device</label>
+                  <label class="cursor-pointer w-full py-2.5 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 hover:border-amber-400 text-stone-200 text-xs font-mono flex items-center justify-center gap-2 transition-colors">
+                    <i data-lucide="upload-cloud" class="w-4 h-4 text-amber-400"></i>
+                    <span id="pm-upload-btn-text">Browse & Select Photo (JPG, PNG, WebP)</span>
+                    <input type="file" id="pm-file-input" accept="image/*" class="hidden" />
+                  </label>
+                  <p class="text-[10px] font-mono text-stone-500 mt-1">Photo is automatically scaled & optimized for high-res web viewing.</p>
+                </div>
+
+                <!-- Option B: Local Path or Web Link -->
+                <div>
+                  <label class="block text-xs font-mono text-stone-400 uppercase mb-1">Option B: Or Enter Local Path / Image URL</label>
+                  <input type="text" id="pm-url-input" placeholder="e.g. assets/photos/the-strike-boston.jpg or https://..." class="w-full bg-stone-900 border border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-100 font-mono focus:outline-none focus:border-amber-400" />
+                </div>
+
+                <!-- Save Button -->
+                <button type="button" id="pm-save-photo-btn" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all">
+                  <i data-lucide="check" class="w-4 h-4"></i>
+                  <span>Save Photo for this Concert</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Batch Actions & Folder Sync -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+            <h3 class="text-lg font-serif-editorial font-bold text-stone-100 flex items-center gap-2">
+              <i data-lucide="folder-cog" class="w-4 h-4 text-amber-400"></i>
+              <span>Batch Sync & Local Folder Tools</span>
+            </h3>
+            <span class="text-xs font-mono text-stone-400">Method 2: assets/photos/ Folder</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-stone-950/60 border border-stone-800 space-y-2">
+              <div class="text-xs font-mono font-bold text-stone-200">Local Folder Auto-Sync</div>
+              <p class="text-xs text-stone-400 leading-relaxed">
+                Drop your photos into <code class="text-amber-400">assets/photos/</code> following the naming table, then click below to link all 18 concerts at once.
+              </p>
+              <button type="button" id="pm-switch-local-folder-btn" class="mt-2 w-full py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-amber-400 text-xs font-mono flex items-center justify-center gap-1.5 transition-colors">
+                <i data-lucide="folder-check" class="w-3.5 h-3.5"></i>
+                <span>Switch All Shows to assets/photos/*.jpg</span>
+              </button>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-stone-950/60 border border-stone-800 space-y-2">
+              <div class="text-xs font-mono font-bold text-stone-200">Restore Placeholders</div>
+              <p class="text-xs text-stone-400 leading-relaxed">
+                Revert all images back to the high-res live concert web placeholders anytime without losing your review narratives.
+              </p>
+              <button type="button" id="pm-restore-placeholders-btn" class="mt-2 w-full py-2 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-400 hover:text-stone-200 text-xs font-mono flex items-center justify-center gap-1.5 transition-colors">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Restore Web Placeholders</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Documentation Table Accordion -->
+          <details class="deckled-card p-4 rounded-2xl border border-stone-800 bg-stone-950 text-xs font-mono text-stone-400">
+            <summary class="cursor-pointer text-amber-400 font-bold flex items-center gap-2 select-none">
+              <i data-lucide="help-circle" class="w-4 h-4"></i>
+              <span>View Recommended Filenames for assets/photos/ (Click to expand)</span>
+            </summary>
+            <div class="mt-3 overflow-x-auto">
+              <table class="w-full text-left text-[11px] border-collapse">
+                <thead>
+                  <tr class="border-b border-stone-800 text-stone-300">
+                    <th class="py-1.5 pr-4">Expected Filename</th>
+                    <th class="py-1.5">Concert & Venue</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-900 text-stone-400">
+                  <tr><td class="py-1 text-amber-400">the-strike-boston.jpg</td><td>The Strike · Brighton Music Hall</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-mohegan.jpg</td><td>5SOS & CAMINO · Mohegan Sun Arena</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-boston.jpg</td><td>5SOS & CAMINO · TD Garden</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-msg-1.jpg</td><td>5SOS & CAMINO · MSG Night 1</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-msg-2.jpg</td><td>5SOS & CAMINO · MSG Night 2</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-la.jpg</td><td>5SOS & CAMINO · Kia Forum LA</td></tr>
+                  <tr><td class="py-1 text-amber-400">camino-nantucket.jpg</td><td>The Band CAMINO · The Muse (Nantucket)</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-buffalo.jpg</td><td>5SOS & CAMINO · Darien Lake</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-pineknob.jpg</td><td>5SOS & CAMINO · Pine Knob (Clarkston)</td></tr>
+                  <tr><td class="py-1 text-amber-400">5sos-camino-raleigh.jpg</td><td>5SOS & CAMINO · Raleigh Music Park</td></tr>
+                  <tr><td class="py-1 text-amber-400">incolor-detroit.jpg</td><td>In Color · Majestic Theatre Detroit</td></tr>
+                  <tr><td class="py-1 text-amber-400">incolor-toledo.jpg</td><td>In Color · Frankie's Bar Toledo</td></tr>
+                  <tr><td class="py-1 text-amber-400">jonas-msg.jpg</td><td>Jonas Brothers · MSG</td></tr>
+                  <tr><td class="py-1 text-amber-400">incolor-irvingplaza.jpg</td><td>In Color · Irving Plaza NYC</td></tr>
+                  <tr><td class="py-1 text-amber-400">camino-memphis-1.jpg</td><td>The Band CAMINO · Memphis Night 1</td></tr>
+                  <tr><td class="py-1 text-amber-400">camino-memphis-2.jpg</td><td>The Band CAMINO · Memphis Night 2</td></tr>
+                  <tr><td class="py-1 text-amber-400">jonas-boston.jpg</td><td>Jonas Brothers · TD Garden Boston</td></tr>
+                  <tr><td class="py-1 text-amber-400">teddy-swims-boston.jpg</td><td>Teddy Swims · TD Garden Boston</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
